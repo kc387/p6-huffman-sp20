@@ -91,7 +91,7 @@ public class HuffProcessor {
 		out.close();
 	}
 
-	public HuffNode readTree(BitInputStream in){
+	private HuffNode readTree(BitInputStream in){
 		int bit = in.readBits(1);
 		if (bit == -1) throw new HuffException("reading bits failed");
 		if (bit == 0){
@@ -105,7 +105,7 @@ public class HuffProcessor {
 		}
 	}
 
-	public int[] readForCounts(BitInputStream in){
+	private int[] readForCounts(BitInputStream in){
 		int[] freq = new int[ALPH_SIZE + 1];
 		freq[PSEUDO_EOF] = 1;
 		while(true){
@@ -116,7 +116,7 @@ public class HuffProcessor {
 		return freq;
 	}
 
-	public HuffNode makeTreeFromCounts(int[] freq){
+	private HuffNode makeTreeFromCounts(int[] freq){
 		PriorityQueue<HuffNode> pq = new PriorityQueue<>();
 		for(int index = 0; index < freq.length; index++) {
 			if(freq[index] > 0) pq.add(new HuffNode(index,freq[index],null,null));
@@ -133,13 +133,13 @@ public class HuffProcessor {
 		return root;
 	}
 
-	public String[] makeCodingsFromTree(HuffNode root){
+	private String[] makeCodingsFromTree(HuffNode root){
 		String[] encodings = new String[ALPH_SIZE + 1];
 		paths(root, "", encodings);
 		return encodings;
 	}
 
-	public void paths(HuffNode root, String path, String[] encodings){
+	private void paths(HuffNode root, String path, String[] encodings){
 		if (root.myLeft == null && root.myRight == null){
 			encodings[root.myValue] = path;
 			return;
@@ -148,7 +148,7 @@ public class HuffProcessor {
 		paths(root.myRight, path + "1", encodings);
 	}
 
-	public void writeHeader(HuffNode root, BitOutputStream out){
+	private void writeHeader(HuffNode root, BitOutputStream out){
 		if(root == null) return;
 		if(root.myLeft != null || root.myRight != null){
 			out.writeBits(1, 0);
@@ -161,7 +161,7 @@ public class HuffProcessor {
 		}
 	}
 
-	public void writeCompressedBits(String[] encodings, BitInputStream in, BitOutputStream out){
+	private void writeCompressedBits(String[] encodings, BitInputStream in, BitOutputStream out){
 		while(true){
 			int val = in.readBits(BITS_PER_WORD);
 			if(val == -1) break;
